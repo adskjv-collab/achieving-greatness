@@ -1,0 +1,687 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Achieving Greatness · Member Login</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;0,600;0,700;1,500;1,600&family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,600;9..40,700&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<style>
+:root{
+--ink:#2a1630; --plum:#4a1d4f; --plum2:#6b2c6f; --blush:#f8e6ea; --blush2:#fdf3f5;
+--rose:#c95c7c; --gold:#b0822f; --gold2:#d9b66a; --gold3:#f3e3bb; --cream:#fffaf6;
+--line:#ecd9dd; --muted:#7d6a7f; --ok:#2f7d5b; --warn:#b5651d;
+--r:18px; --shadow:0 10px 30px -14px rgba(74,29,79,.35);
+}
+*{box-sizing:border-box}
+html,body{margin:0;background:var(--cream);color:var(--ink);font-family:"DM Sans",system-ui,sans-serif;font-size:16px;line-height:1.5}
+h1,h2,h3,.serif{font-family:"Cormorant Garamond",Georgia,serif;font-weight:600;line-height:1.1;margin:0}
+h1{font-size:2.2rem} h2{font-size:1.75rem} h3{font-size:1.3rem}
+a{color:var(--plum2)}
+button{font:inherit;cursor:pointer}
+input,textarea,select{font:inherit;color:var(--ink);width:100%;padding:.7rem .85rem;border:1.5px solid var(--line);border-radius:12px;background:#fff;outline:none}
+input:focus,textarea:focus,select:focus{border-color:var(--gold2);box-shadow:0 0 0 3px var(--gold3)}
+textarea{min-height:76px;resize:vertical}
+label{display:block;font-weight:600;font-size:.88rem;margin:.9rem 0 .3rem}
+.hint{font-size:.82rem;color:var(--muted);font-weight:400}
+.wrap{max-width:1040px;margin:0 auto;padding:0 18px}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:.45rem;border:0;border-radius:999px;padding:.72rem 1.25rem;font-weight:600;background:var(--plum);color:#fff;transition:transform .15s, box-shadow .15s}
+.btn:hover{transform:translateY(-1px);box-shadow:var(--shadow)}
+.btn.gold{background:linear-gradient(135deg,#c9a14e,#a87824);color:#fff}
+.btn.ghost{background:#fff;color:var(--plum);border:1.5px solid var(--line)}
+.btn.sm{padding:.45rem .9rem;font-size:.88rem}
+.btn:disabled{opacity:.45;cursor:not-allowed;transform:none;box-shadow:none}
+.card{background:#fff;border:1px solid var(--line);border-radius:var(--r);padding:20px;box-shadow:0 2px 0 rgba(74,29,79,.03)}
+.grid{display:grid;gap:16px}
+@media(min-width:760px){.g2{grid-template-columns:1fr 1fr}.g3{grid-template-columns:repeat(3,1fr)}}
+.pill{display:inline-flex;align-items:center;gap:.35rem;font-size:.75rem;font-weight:700;letter-spacing:.06em;text-transform:uppercase;padding:.28rem .65rem;border-radius:999px;background:var(--blush);color:var(--plum)}
+.pill.gold{background:var(--gold3);color:#7a5714}
+.pill.ok{background:#e1f2ea;color:var(--ok)}
+.eyebrow{font-size:.74rem;font-weight:700;letter-spacing:.16em;text-transform:uppercase;color:var(--gold)}
+.muted{color:var(--muted)}
+.row{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+.between{justify-content:space-between}
+.mt{margin-top:16px}.mt2{margin-top:28px}.mb{margin-bottom:12px}
+hr{border:0;border-top:1px solid var(--line);margin:18px 0}
+
+/* top bar + goal ribbon */
+.top{position:sticky;top:0;z-index:30;background:rgba(255,250,246,.94);backdrop-filter:blur(10px);border-bottom:1px solid var(--line)}
+.brand{display:flex;align-items:center;gap:10px;padding:10px 0}
+.mark{width:34px;height:34px;border-radius:50%;background:radial-gradient(circle at 30% 30%,#f3d9a0,#b0822f);display:grid;place-items:center;color:#fff;font-family:"Cormorant Garamond";font-weight:700;font-size:1.05rem;box-shadow:0 0 0 3px #fff,0 0 0 4px var(--gold2)}
+.brand b{font-family:"Cormorant Garamond";font-size:1.3rem;font-weight:700;letter-spacing:.01em}
+.ribbon{display:flex;gap:8px;overflow-x:auto;padding:0 0 10px;scrollbar-width:none}
+.ribbon::-webkit-scrollbar{display:none}
+.gchip{flex:1 0 260px;display:flex;gap:10px;align-items:center;background:linear-gradient(135deg,var(--plum),var(--plum2));color:#fff;border-radius:14px;padding:9px 12px;border:0;text-align:left}
+.gchip.long{background:linear-gradient(135deg,#8c6420,#b0822f)}
+.gchip small{display:block;font-size:.66rem;letter-spacing:.14em;text-transform:uppercase;opacity:.8;font-weight:700}
+.gchip span.t{display:block;font-weight:600;font-size:.9rem;line-height:1.25;overflow:hidden;text-overflow:ellipsis;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical}
+.gchip .n{margin-left:auto;font-family:"Cormorant Garamond";font-size:1.25rem;font-weight:700;white-space:nowrap}
+
+/* nav */
+.tabs{display:none;gap:4px}
+.tabs button{border:0;background:none;padding:.5rem .85rem;border-radius:999px;font-weight:600;color:var(--muted)}
+.tabs button.on{background:var(--plum);color:#fff}
+.bnav{position:fixed;left:0;right:0;bottom:0;z-index:40;background:#fff;border-top:1px solid var(--line);display:grid;grid-template-columns:repeat(5,1fr);padding:6px 4px calc(6px + env(safe-area-inset-bottom))}
+.bnav button{border:0;background:none;display:flex;flex-direction:column;align-items:center;gap:2px;font-size:.7rem;font-weight:600;color:var(--muted);padding:4px 0}
+.bnav button i{font-style:normal;font-size:1.25rem;line-height:1}
+.bnav button.on{color:var(--plum)}
+.bnav button.on i{transform:scale(1.12)}
+main{padding:22px 0 110px}
+@media(min-width:860px){.tabs{display:flex}.bnav{display:none}main{padding-bottom:60px}}
+
+/* hero card */
+.hero{background:radial-gradient(120% 140% at 100% 0%,#f9dfe6 0%,#fff 55%);border:1px solid var(--line);border-radius:24px;padding:22px;position:relative;overflow:hidden}
+.hero:after{content:"";position:absolute;right:-40px;top:-40px;width:160px;height:160px;border-radius:50%;border:1.5px solid var(--gold3)}
+.score{display:flex;align-items:center;gap:14px}
+.ring{--p:0;width:86px;height:86px;border-radius:50%;background:conic-gradient(var(--gold) calc(var(--p)*1%),var(--blush) 0);display:grid;place-items:center;flex:none}
+.ring>div{width:68px;height:68px;border-radius:50%;background:#fff;display:grid;place-items:center;text-align:center;font-family:"Cormorant Garamond";font-weight:700;font-size:1.45rem;line-height:1}
+.ring>div small{display:block;font-family:"DM Sans";font-size:.6rem;letter-spacing:.1em;color:var(--muted);font-weight:700}
+
+/* checklist */
+.check{display:flex;gap:12px;align-items:flex-start;padding:12px 0;border-bottom:1px dashed var(--line)}
+.check:last-child{border-bottom:0}
+.box{flex:none;width:26px;height:26px;border-radius:8px;border:2px solid var(--gold2);display:grid;place-items:center;color:#fff;font-weight:800;font-size:.85rem;margin-top:1px}
+.box.on{background:var(--gold);border-color:var(--gold)}
+.check b{display:block}
+.check .act{margin-left:auto}
+
+/* goal card */
+.goal{border-radius:var(--r);padding:20px;color:#fff;background:linear-gradient(140deg,var(--plum),#7a3480);position:relative;overflow:hidden}
+.goal.long{background:linear-gradient(140deg,#7d5a1c,#b8893b)}
+.goal h3{font-size:1.45rem;margin:.35rem 0 .6rem}
+.goal .bar{height:10px;background:rgba(255,255,255,.22);border-radius:99px;overflow:hidden;margin:.5rem 0}
+.goal .bar>i{display:block;height:100%;background:#fff;border-radius:99px;transition:width .5s}
+.goal .btn{background:#fff;color:var(--plum)}
+.goal.long .btn{color:#7d5a1c}
+.goal .btn.clear{background:rgba(255,255,255,.16);color:#fff}
+.goal .meta{font-size:.85rem;opacity:.9}
+
+/* frog */
+.frog{display:flex;gap:12px;align-items:center}
+.frog .em{font-size:2rem}
+.done-strike{text-decoration:line-through;opacity:.6}
+
+/* chart */
+.bars{display:flex;align-items:flex-end;gap:8px;height:120px;padding-top:10px}
+.bars .col{flex:1;display:flex;flex-direction:column;align-items:center;gap:4px;height:100%;justify-content:flex-end}
+.bars .b{width:100%;max-width:34px;border-radius:8px 8px 3px 3px;background:var(--blush);position:relative}
+.bars .b.hit{background:linear-gradient(180deg,var(--gold2),var(--gold))}
+.bars .b em{position:absolute;top:-18px;left:0;right:0;text-align:center;font-style:normal;font-size:.72rem;font-weight:700;color:var(--plum)}
+.bars .lbl{font-size:.66rem;color:var(--muted)}
+.tline{border-top:2px dashed var(--rose);position:relative}
+.diag{border-radius:14px;padding:14px 16px;margin-top:14px;font-size:.95rem}
+.diag.push{background:#fdf0e6;border:1px solid #f1d3b8}
+.diag.adjust{background:#f3ebf7;border:1px solid #dccbe6}
+.diag.win{background:#e7f4ee;border:1px solid #c7e4d6}
+.diag.steady{background:var(--blush2);border:1px solid var(--line)}
+
+/* library */
+.book{display:flex;flex-direction:column;gap:8px}
+.book .by{font-size:.85rem;color:var(--muted)}
+.links{display:flex;gap:8px;flex-wrap:wrap;margin-top:4px}
+.links a{font-size:.82rem;font-weight:600;text-decoration:none;padding:.4rem .75rem;border-radius:999px;background:var(--blush2);border:1px solid var(--line);color:var(--plum)}
+.links a.yt{background:#fde8e8;border-color:#f6caca;color:#a3262a}
+.links a.free{background:#e7f4ee;border-color:#c7e4d6;color:var(--ok)}
+.sub{display:flex;gap:6px;flex-wrap:wrap;margin:6px 0 18px}
+.sub button{border:1.5px solid var(--line);background:#fff;border-radius:999px;padding:.45rem .9rem;font-weight:600;color:var(--muted)}
+.sub button.on{border-color:var(--plum);background:var(--plum);color:#fff}
+.note{background:var(--gold3);border-radius:14px;padding:14px 16px;font-size:.92rem}
+blockquote{margin:10px 0 0;padding:12px 16px;border-left:3px solid var(--gold2);background:var(--blush2);border-radius:0 12px 12px 0;font-family:"Cormorant Garamond";font-size:1.15rem;font-style:italic;line-height:1.35}
+blockquote cite{display:block;font-family:"DM Sans";font-style:normal;font-size:.78rem;font-weight:700;letter-spacing:.06em;color:var(--gold);margin-top:6px}
+
+/* meeting */
+.agenda .check{align-items:center}
+.who{display:flex;align-items:center;gap:8px}
+.av{width:30px;height:30px;border-radius:50%;display:grid;place-items:center;background:var(--blush);color:var(--plum);font-weight:700;font-size:.85rem}
+.ro{white-space:pre-wrap;background:var(--blush2);border-radius:10px;padding:10px 12px;min-height:40px;font-size:.93rem}
+
+/* rules */
+.rule{display:flex;gap:14px;padding:16px 0;border-bottom:1px solid var(--line)}
+.rule:last-child{border-bottom:0}
+.rule .num{flex:none;width:38px;height:38px;border-radius:50%;background:var(--plum);color:#fff;display:grid;place-items:center;font-family:"Cormorant Garamond";font-weight:700;font-size:1.2rem}
+
+/* modal */
+.scrim{position:fixed;inset:0;background:rgba(42,22,48,.45);z-index:60;display:flex;align-items:flex-end;justify-content:center}
+@media(min-width:700px){.scrim{align-items:center}}
+.sheet{background:#fff;width:100%;max-width:560px;max-height:92vh;overflow:auto;border-radius:22px 22px 0 0;padding:22px 20px calc(22px + env(safe-area-inset-bottom))}
+@media(min-width:700px){.sheet{border-radius:22px}}
+.toast{position:fixed;left:50%;bottom:90px;transform:translateX(-50%);background:var(--ink);color:#fff;padding:.7rem 1.1rem;border-radius:999px;z-index:80;font-weight:600;font-size:.92rem;box-shadow:var(--shadow);max-width:90vw;text-align:center}
+.lock{max-width:560px;margin:60px auto;text-align:center}
+.confetti{position:fixed;top:-12px;width:9px;height:14px;z-index:90;border-radius:2px;pointer-events:none;animation:fall linear forwards}
+@keyframes fall{to{transform:translateY(105vh) rotate(720deg);opacity:.8}}
+.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+.stats .eyebrow{font-size:.62rem;letter-spacing:.1em}
+.streak{font-family:"Cormorant Garamond";font-size:2.4rem;font-weight:700;line-height:1;color:var(--gold)}
+.stepdots{display:flex;gap:6px;margin:8px 0 14px}
+.stepdots i{flex:1;height:5px;border-radius:9px;background:var(--line)}
+.stepdots i.on{background:var(--gold)}
+.pledge{display:flex;gap:10px;align-items:flex-start;padding:10px 0;font-size:.95rem}
+.pledge input{width:22px;height:22px;flex:none;margin-top:2px;accent-color:var(--plum)}
+.small{font-size:.85rem}
+.lockline{display:flex;gap:10px;align-items:center;background:var(--blush2);border:1px dashed var(--line);border-radius:12px;padding:10px 12px;font-size:.88rem;margin-top:12px}
+.loglist{list-style:none;margin:0;padding:0}
+.loglist li{padding:9px 0;border-bottom:1px dashed var(--line);font-size:.9rem}
+.loglist li:last-child{border-bottom:0}
+</style>
+</head>
+<body>
+<div id="app"><div class="lock"><div class="mark" style="margin:0 auto 14px">AG</div><p class="muted">Opening the members' room…</p></div></div>
+<div id="layer"></div>
+
+<script>
+/* ============ CONTENT ============ */
+const KJV = {
+phil: {ref:"Philippians 2:14-15 (KJV)", text:"Do all things without murmurings and disputings: That ye may be blameless and harmless, the sons of God, without rebuke, in the midst of a crooked and perverse nation, among whom ye shine as lights in the world;"},
+prov14: {ref:"Proverbs 14:23 (KJV)", text:"In all labour there is profit: but the talk of the lips tendeth only to penury."},
+prov21: {ref:"Proverbs 21:5 (KJV)", text:"The thoughts of the diligent tend only to plenteousness; but of every one that is hasty only to want."},
+prov27: {ref:"Proverbs 27:17 (KJV)", text:"Iron sharpeneth iron; so a man sharpeneth the countenance of his friend."},
+eccl4: {ref:"Ecclesiastes 4:9-10 (KJV)", text:"Two are better than one; because they have a good reward for their labour. For if they fall, the one will lift up his fellow: but woe to him that is alone when he falleth; for he hath not another to help him up."},
+eccl5: {ref:"Ecclesiastes 5:5 (KJV)", text:"Better is it that thou shouldest not vow, than that thou shouldest vow and not pay."},
+hab: {ref:"Habakkuk 2:2-3 (KJV)", text:"And the LORD answered me, and said, Write the vision, and make it plain upon tables, that he may run that readeth it. For the vision is yet for an appointed time, but at the end it shall speak, and not lie: though it tarry, wait for it; because it will surely come, it will not tarry."},
+deut: {ref:"Deuteronomy 8:18 (KJV)", text:"But thou shalt remember the LORD thy God: for it is he that giveth thee power to get wealth, that he may establish his covenant which he sware unto thy fathers, as it is this day."},
+james: {ref:"James 2:17 (KJV)", text:"Even so faith, if it hath not works, is dead, being alone."},
+acts: {ref:"Acts 17:11 (KJV)", text:"These were more noble than those in Thessalonica, in that they received the word with all readiness of mind, and searched the scriptures daily, whether those things were so."}
+};
+const BG = q => "https://www.biblegateway.com/passage/?search="+encodeURIComponent(q)+"&version=KJV";
+
+const DISC_BOOKS = [
+{id:"noexcuses", title:"No Excuses!", by:"Brian Tracy · 21 chapters on self-discipline", chapters:21,
+links:[{t:"Free audiobook · Libby",u:"https://share.libbyapp.com/title/335979",c:"free"},{t:"Free audiobook · Hoopla",u:"https://www.hoopladigital.com/audiobook/No-Excuses-Brian-Tracy/12162232",c:"free"},{t:"YouTube · Brian Tracy on self-discipline",u:"https://www.youtube.com/watch?v=pyNfB24Eo4A",c:"yt"}]},
+{id:"frog", title:"Eat That Frog!", by:"Brian Tracy · 21 ways to stop procrastinating",chapters:21,
+links:[{t:"Free audiobook · Libby",u:"https://share.libbyapp.com/title/120764",c:"free"},{t:"Free audiobook · Hoopla",u:"https://www.hoopladigital.com/audiobook/Eat-That-Frog-Brian-Tracy/17384383",c:"free"},{t:"YouTube · Brian Tracy on procrastination",u:"https://www.youtube.com/watch?v=0EUfy6pFPmg",c:"yt"}]}
+];
+
+const WEALTH = [
+{sec:"Scripture first", blurb:"Free to read in the King James Version. Every Bible Gateway page has a speaker button so you can listen instead.", items:[
+{id:"proverbs", title:"Proverbs of the Day", by:"Read the chapter that matches today's date. 31 chapters, one month, on repeat.", dyn:"proverbs"},
+{id:"deut8", title:"Deuteronomy 8", by:"Remember who gives the power to get wealth.", links:[{t:"Read / listen",u:BG("Deuteronomy 8"),c:"free"}]},
+{id:"matt25", title:"Matthew 25:14-30", by:"The parable of the talents. Faithful with little, ruler over much.", links:[{t:"Read / listen",u:BG("Matthew 25:14-30"),c:"free"}]},
+{id:"luke16", title:"Luke 16:1-13", by:"Faithfulness in what is least, and who we serve.", links:[{t:"Read / listen",u:BG("Luke 16:1-13"),c:"free"}]},
+{id:"2cor9", title:"2 Corinthians 9", by:"Sowing, reaping and the cheerful giver.", links:[{t:"Read / listen",u:BG("2 Corinthians 9"),c:"free"}]},
+{id:"mal3", title:"Malachi 3:8-12", by:"Tithes, offerings and the open windows of heaven.", links:[{t:"Read / listen",u:BG("Malachi 3:8-12"),c:"free"}]},
+{id:"ps112", title:"Psalm 112", by:"Wealth and riches in the house of the one who fears the Lord.", links:[{t:"Read / listen",u:BG("Psalm 112"),c:"free"}]},
+{id:"eccl5", title:"Ecclesiastes 5:10-20", by:"Enjoying the fruit of your labour as a gift of God.", links:[{t:"Read / listen",u:BG("Ecclesiastes 5:10-20"),c:"free"}]},
+{id:"scourby", title:"The whole KJV Bible on YouTube", by:"Read aloud by Alexander Scourby, with the text on screen.", links:[{t:"YouTube playlist",u:"https://www.youtube.com/playlist?list=PLyH3jcNYnj_vee7HfFWgGmcW2E3qdsHLi",c:"yt"}]}
+]},
+{sec:"Christian classics · free forever", blurb:"Public domain, so there is no cost and no excuse.", items:[
+{id:"acres", title:"Acres of Diamonds", by:"Russell H. Conwell, Baptist minister and founder of Temple University", links:[{t:"Free audiobook · LibriVox",u:"https://archive.org/details/acres_of_diamonds_1008_librivox",c:"free"},{t:"Free ebook · Gutenberg",u:"https://www.gutenberg.org/ebooks/368",c:"free"}]},
+{id:"wesley", title:"The Use of Money (Sermon 50)", by:"John Wesley · gain all you can, save all you can, give all you can", links:[{t:"Read free · Wesley Center",u:"https://wesley.nnu.edu/john-wesley/the-sermons-of-john-wesley-1872-edition/sermon-50-the-use-of-money/",c:"free"}]}
+]},
+{sec:"Christian stewardship · free with a library card", blurb:"Libby and Hoopla are free apps. Sign in with any public library card.", items:[
+{id:"treasure", title:"The Treasure Principle", by:"Randy Alcorn", links:[{t:"Audiobook · Libby",u:"https://share.libbyapp.com/title/137385",c:"free"}]},
+{id:"mpe", title:"Money, Possessions, and Eternity", by:"Randy Alcorn", links:[{t:"Audiobook · Hoopla",u:"https://www.hoopladigital.com/title/11030204",c:"free"}]}
+]},
+{sec:"Classic prosperity books", blurb:"The traditional wealth classics. Read them with your Bible open.", note:"acts", items:[
+{id:"sogr", title:"The Science of Getting Rich", by:"Wallace D. Wattles · 1910", links:[{t:"Free audiobook · LibriVox",u:"https://librivox.org/the-science-of-getting-rich-by-wallace-d-wattles/",c:"free"},{t:"Free PDF",u:"https://www.archive.org/download/science_gettingrich_1005_librivox/science_getting_rich_1210.pdf",c:"free"}]},
+{id:"tagr", title:"Think and Grow Rich", by:"Napoleon Hill · 1937 text", links:[{t:"Free ebook · Global Grey",u:"https://www.globalgreyebooks.com/think-and-grow-rich-ebook/",c:"free"},{t:"Audiobook · Hoopla",u:"https://www.hoopladigital.com/title/12464680",c:""}]},
+{id:"dlp", title:"The Dynamic Laws of Prosperity", by:"Catherine Ponder · 1962", links:[{t:"Full audiobook · Hoopla",u:"https://www.hoopladigital.com/title/12895514",c:""},{t:"Her lectures · Hoopla",u:"https://www.hoopladigital.com/audiobook/the-dynamic-laws-of-prosperity-catherine-ponder/12291204",c:""}]},
+{id:"babylon", title:"The Richest Man in Babylon", by:"George S. Clason · 1926", links:[{t:"Free audiobook · LibriVox (first 3 parables)",u:"https://archive.org/details/richestman_2604_librivox",c:"free"}]}
+]}
+];
+const ALL_WEALTH = WEALTH.flatMap(s=>s.items).filter(i=>i.id!=="scourby");
+
+const AGENDA = [
+{k:"pray",t:"Open in prayer",d:"Invite God into the hour."},
+{k:"wins",t:"Wins",d:"Celebrate first. Big or small, say it out loud."},
+{k:"review",t:"Last week's commitments",d:"Done or not done. No stories, just the truth."},
+{k:"numbers",t:"The scoreboard",d:"Actions vs. target, results logged. Are the actions moving the results?"},
+{k:"books",t:"Book takeaways",d:"One line from the discipline book, one from the wealth book."},
+{k:"hot",t:"Challenges & help needed",d:"Hot seat. Ask for exactly what you need."},
+{k:"adjust",t:"Adjustments",d:"What changes based on the data? More action, new strategy, prayer and fasting?"},
+{k:"commit",t:"Next week's commitments",d:"Specific, measurable, with an if-then plan."},
+{k:"close",t:"Close in prayer & declaration",d:"Pray over each other's goals by name."}
+];
+
+const RULES = [
+{t:"We commit.", d:"Your goals are written down and agreed to. A goal you can't see is a wish, so yours stays at the top of every screen.", v:"eccl5"},
+{t:"We take it seriously.", d:"Show up to the weekly meeting, do the reading, log honestly. Every week has four non-negotiables: one chapter of the discipline book, one chapter of a wealth book, your action target, and the meeting."},
+{t:"No grumbling. No murmuring.", d:"We don't rehearse what isn't working. We talk about what we're doing.", v:"phil"},
+{t:"Earn the right to evaluate.", d:"You can't call a strategy \"not working\" until you've logged 5 actions on it since your last check-in. When you've earned it, the Evaluate button unlocks and you bring three things: what the numbers say, the one thing you'll change, and what God says.", v:"prov14"},
+{t:"Flip it on the spot.", d:"If a doubt slips out, flip it right then: say the truth, then name your next action. Use the Flip It button so the flip gets written down."},
+{t:"The numbers guide us, they don't shame us.", d:"Behind on actions? Increase the action. On target for 3 weeks with no results? Adjust the strategy, seek counsel, and consider prayer and fasting.", v:"prov21"},
+{t:"Iron sharpens iron.", d:"Honest, loving accountability. We ask the hard question and we pray for each other by name.", v:"prov27"},
+{t:"What's shared here stays here.", d:"Goals, numbers and struggles stay between the members."}
+];
+
+/* ============ UTIL ============ */
+const $ = s => document.querySelector(s);
+const esc = s => String(s==null?"":s).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+const pad = n => String(n).padStart(2,"0");
+const dayKey = d => d.getFullYear()+"-"+pad(d.getMonth()+1)+"-"+pad(d.getDate());
+function weekKey(d){const t=new Date(Date.UTC(d.getFullYear(),d.getMonth(),d.getDate()));const day=t.getUTCDay()||7;t.setUTCDate(t.getUTCDate()+4-day);const y=t.getUTCFullYear();const w=Math.ceil(((t-Date.UTC(y,0,1))/864e5+1)/7);return y+"-W"+pad(w)}
+function monday(d){const x=new Date(d.getFullYear(),d.getMonth(),d.getDate());const k=(x.getDay()+6)%7;x.setDate(x.getDate()-k);return x}
+const addDays=(d,n)=>{const x=new Date(d);x.setDate(x.getDate()+n);return x};
+const fmtShort = d => d.toLocaleDateString(undefined,{month:"short",day:"numeric"});
+function weekLabel(off){const m=addDays(monday(new Date()),off*7);return "Week of "+fmtShort(m)}
+function wkAt(off){return weekKey(addDays(monday(new Date()),off*7+3))}
+function isObj(o){return o&&typeof o==="object"&&!Array.isArray(o)}
+function merge(a,b){const out=isObj(a)?{...a}:{};for(const k in b){out[k]=isObj(b[k])&&isObj(out[k])?merge(out[k],b[k]):b[k]}return out}
+function clone(o){return JSON.parse(JSON.stringify(o||{}))}
+const initials = n => (n||"?").trim().slice(0,1).toUpperCase();
+
+/* ============ STATE ============ */
+const S = {db:null,user:null,uid:null,members:{},meetings:{},library:[],view:"home",libTab:"disc",meetOff:0,loading:true,slow:false,blocked:false,readOnly:false,wq:Promise.resolve(),draft:{},pending:0,stage:"load"};
+const me = () => S.members[S.uid]||null;
+const wkData = (m,wk) => (m&&m.weeks&&m.weeks[wk])||{};
+const goalsOf = m => (m&&m.goals)||{};
+
+/* ============ CONFIG ============ */
+const SUPABASE_URL="https://qcjwhzvwwawonbgokrkf.supabase.co";
+const SUPABASE_ANON_KEY="sb_publishable_EIyQ3Pavatp9xw59ZqExCw_4ACsm4Ee";
+const PUBLIC_PAGE="https://claude.ai/artifact/Esi3ewQcYe1Bycu5jncPgn";
+
+/* ============ DATA ============ */
+let SB=null;
+function errText(e){return String((e&&(e.message||e.error_description))||e||"")}
+async function loadAll(){
+const [m,mt,lib]=await Promise.all([SB.from("ag_members").select("id,name,doc"),SB.from("ag_meetings").select("week,doc"),SB.from("ag_library").select("*").order("added_at",{ascending:false})]);
+if(m.error)throw m.error;
+if(S.pending>0)return;
+const members={};(m.data||[]).forEach(r=>{members[r.id]=Object.assign({},r.doc||{},{name:(r.doc&&r.doc.name)||r.name})});
+const meetings={};(mt.data||[]).forEach(r=>{meetings[r.week]=r.doc||{}});
+S.members=members;S.meetings=meetings;
+S.library=(lib.data||[]).map(r=>({id:String(r.id),title:r.title,url:r.url,note:r.note,shelf:r.shelf,by:r.added_by,at:Date.parse(r.added_at)||0}));
+S.isMember=!!members[S.uid];
+}
+async function afterSignIn(){
+S.stage="load";render();
+try{await loadAll()}catch(e){S.stage="auth";S.loading=false;render();toast("Couldn't load your data. Try again.");return}
+if(!S.isMember){S.stage="code";S.loading=false;render();return}
+S.stage="app";S.loading=false;render();
+}
+setTimeout(async function boot(){
+window.addEventListener("hashchange",()=>{const h=location.hash.slice(1);if(VIEWS[h]){S.view=h;render()}});
+const h=location.hash.slice(1);if(VIEWS[h])S.view=h;
+if(!window.supabase||SUPABASE_URL.indexOf("__")===0){S.stage="auth";S.loading=false;S.offline=true;render();return}
+SB=window.supabase.createClient(SUPABASE_URL,SUPABASE_ANON_KEY,{auth:{persistSession:true,autoRefreshToken:true}});
+SB.auth.onAuthStateChange(ev=>{if(ev==="PASSWORD_RECOVERY"){S.stage="reset";S.loading=false;render()}});
+const {data}=await SB.auth.getSession();
+if(S.stage==="reset"){}else if(data&&data.session){S.uid=data.session.user.id;S.email=data.session.user.email;await afterSignIn()}
+else{S.stage="auth";S.loading=false;render()}
+setInterval(()=>{if(S.stage==="app"&&!document.hidden&&!$("#layer").innerHTML&&S.pending===0)loadAll().then(render).catch(()=>{})},30000);
+document.addEventListener("visibilitychange",()=>{if(!document.hidden&&S.stage==="app"&&S.pending===0)loadAll().then(render).catch(()=>{})});
+},0);
+
+/* ============ AUTH ============ */
+async function doSignIn(){
+const email=$("#ae").value.trim(),pw=$("#ap").value;if(!email||!pw){toast("Enter your email and password.");return}
+busy(true);const {data,error}=await SB.auth.signInWithPassword({email,password:pw});busy(false);
+if(error){toast(/invalid/i.test(errText(error))?"That email and password don't match.":"Couldn't sign in. Try again.");return}
+S.uid=data.user.id;S.email=data.user.email;await afterSignIn();
+}
+async function doJoin(){
+const name=$("#jn").value.trim(),email=$("#je").value.trim(),pw=$("#jp").value,code=$("#jc").value.trim();
+if(!name||!email||!code){toast("Fill in your name, email and the member code.");return}
+if(pw.length<8){toast("Pick a password with at least 8 characters.");return}
+busy(true);
+let {data,error}=await SB.auth.signUp({email,password:pw,options:{data:{name}}});
+if(error&&/registered|exists/i.test(errText(error))){({data,error}=await SB.auth.signInWithPassword({email,password:pw}))}
+if(error||!data||!data.session){busy(false);toast(error?(/password/i.test(errText(error))?"That account exists. Use Sign in.":"Couldn't create your account. Try again."):"Check your email to confirm, then sign in.");return}
+S.uid=data.user.id;S.email=data.user.email;
+const r=await SB.rpc("ag_join",{code,member_name:name});busy(false);
+S.draft={name};
+if(r.error){toast(/BAD_CODE/.test(errText(r.error))?"That member code isn't right.":"Couldn't join. Try again.");S.stage="code";render();return}
+await afterSignIn();
+}
+async function doCode(){
+const code=$("#cc").value.trim(),name=($("#cn")||{}).value||"";if(!code){toast("Enter the member code.");return}
+busy(true);const r=await SB.rpc("ag_join",{code,member_name:name.trim()||"Member"});busy(false);
+if(r.error){toast(/BAD_CODE/.test(errText(r.error))?"That member code isn't right.":"Couldn't join. Try again.");return}
+S.draft={name:name.trim()};await afterSignIn();
+}
+async function logOut(){try{await SB.auth.signOut()}catch(e){}S.uid=null;S.members={};S.stage="auth";S.view="home";render()}
+function busy(on){document.querySelectorAll("#app .btn.gold").forEach(b=>{b.disabled=on})}
+
+/* ============ WRITES ============ */
+function queue(fn){S.pending++;S.wq=S.wq.then(fn).catch(e=>{toast("Couldn't save that. Check your connection and try again.")}).finally(()=>{S.pending--});return S.wq}
+function saveMe(patch){
+S.members[S.uid]=merge(me()||{},patch);render();
+const doc=clone(S.members[S.uid]);
+return queue(async()=>{const r=await SB.from("ag_members").update({doc,name:doc.name||"Member",updated_at:new Date().toISOString()}).eq("id",S.uid);if(r.error)throw r.error});
+}
+function saveMeeting(wk,patch){
+S.meetings[wk]=merge(S.meetings[wk]||{},patch);render();
+const doc=clone(S.meetings[wk]);
+return queue(async()=>{const r=await SB.from("ag_meetings").upsert({week:wk,doc,updated_at:new Date().toISOString()});if(r.error)throw r.error});
+}
+
+/* ============ UI HELPERS ============ */
+function toast(msg){const t=document.createElement("div");t.className="toast";t.textContent=msg;document.body.appendChild(t);setTimeout(()=>t.remove(),2600)}
+function confetti(n=46){const cols=["#b0822f","#d9b66a","#c95c7c","#4a1d4f","#f3e3bb","#f2b8c6"];for(let i=0;i<n;i++){const c=document.createElement("i");c.className="confetti";c.style.left=Math.random()*100+"vw";c.style.background=cols[i%cols.length];c.style.animationDuration=(1.2+Math.random()*1.4)+"s";c.style.animationDelay=(Math.random()*.25)+"s";c.style.transform="rotate("+Math.random()*360+"deg)";document.body.appendChild(c);setTimeout(()=>c.remove(),3000)}}
+function verse(k){const v=KJV[k];return v?`<blockquote>${esc(v.text)}<cite>${esc(v.ref)}</cite></blockquote>`:""}
+function openSheet(html){$("#layer").innerHTML=`<div class="scrim" onclick="if(event.target===this)closeSheet()"><div class="sheet">${html}</div></div>`}
+function closeSheet(){$("#layer").innerHTML=""}
+function go(v){S.view=v;try{history.replaceState(null,"","#"+v)}catch(e){location.hash=v}render();window.scrollTo(0,0)}
+
+/* keep typing safe across live re-renders */
+function snapshotInputs(){const o={};document.querySelectorAll("#app [data-k]").forEach(el=>{o[el.dataset.k]=el.type==="checkbox"?el.checked:el.value});const a=document.activeElement;return{o,focus:a&&a.dataset?a.dataset.k:null,s:a&&a.selectionStart,e:a&&a.selectionEnd}}
+function restoreInputs(st){if(!st)return;document.querySelectorAll("#app [data-k]").forEach(el=>{if(el.dataset.k in st.o&&!el.hasAttribute("data-fresh")){if(el.type==="checkbox")el.checked=st.o[el.dataset.k];else el.value=st.o[el.dataset.k]}});if(st.focus){const el=document.querySelector(`#app [data-k="${st.focus}"]`);if(el){el.focus();try{el.setSelectionRange(st.s,st.e)}catch(e){}}}}
+
+/* ============ METRICS ============ */
+function actions(m,wk,g){return +(((wkData(m,wk).actions)||{})[g]||0)}
+function results(m,wk,g){return +(((wkData(m,wk).results)||{})[g]||0)}
+function streak(m){const days=(m&&m.days)||{};let d=new Date();if(!(days[dayKey(d)]||{}).done)d=addDays(d,-1);let n=0;while((days[dayKey(d)]||{}).done){n++;d=addDays(d,-1)}return n}
+function frogsThisWeek(m){const days=(m&&m.days)||{};let n=0;const s=monday(new Date());for(let i=0;i<7;i++){if((days[dayKey(addDays(s,i))]||{}).done)n++}return n}
+function nonNeg(m,wk){
+const w=wkData(m,wk),G=goalsOf(m);
+const tS=+((G.short||{}).leadTarget||0),tL=+((G.long||{}).leadTarget||0);
+const leadOk=(tS?actions(m,wk,"short")>=tS:false)&&(tL?actions(m,wk,"long")>=tL:true);
+const items=[
+{k:"disc",ok:!!(w.disc&&w.disc.ch),t:"Discipline chapter",d:w.disc&&w.disc.ch?`${bookTitle(w.disc.book)} · ch. ${w.disc.ch}`:"One chapter of No Excuses! or Eat That Frog!"},
+{k:"wealth",ok:!!(w.wealth&&w.wealth.ch),t:"Wealth consciousness chapter",d:w.wealth&&w.wealth.ch?`${bookTitle(w.wealth.book)} · ${w.wealth.ch}`:"One chapter (or listen) from the wealth library"},
+{k:"lead",ok:leadOk,t:"Hit your action targets",d:`${actions(m,wk,"short")}/${tS||"–"} short-term · ${actions(m,wk,"long")}/${tL||"–"} long-term`},
+{k:"meet",ok:!!w.meeting,t:"Weekly meeting",d:w.meeting?"You were there.":"Mark yourself present on the Meeting tab"}
+];
+return {items,done:items.filter(i=>i.ok).length};
+}
+function bookTitle(id){const b=DISC_BOOKS.find(x=>x.id===id)||ALL_WEALTH.find(x=>x.id===id);if(b)return b.title;const l=S.library.find(x=>x.id===id);return l?l.title:(id||"")}
+function diagnose(m,g){
+const G=goalsOf(m)[g]||{};const target=+G.leadTarget||0;const wk=wkAt(0);const a=actions(m,wk,g);
+const prev=[-1,-2,-3].map(o=>({a:actions(m,wkAt(o),g),r:results(m,wkAt(o),g)}));
+const recentR=[0,-1,-2,-3].reduce((s,o)=>s+results(m,wkAt(o),g),0);
+if(!target)return{tone:"steady",msg:"Set a weekly action target so the scoreboard can coach you."};
+if(prev.every(w=>w.a>=target)&&prev.every(w=>w.r===0)&&results(m,wk,g)===0)return{tone:"adjust",msg:"Three straight weeks on target and no results logged yet. Your effort is real, so now look at the strategy. Use Evaluate, bring it to the meeting for counsel, and consider setting aside a day of prayer and fasting for direction."};
+if(a<target)return{tone:"push",msg:`You're at ${a} of ${target} ${esc(G.leadLabel||"actions")} this week. Before you change the plan, work the plan: ${target-a} to go.`};
+if(recentR>0)return{tone:"win",msg:`Target hit and results are showing (${recentR} ${esc(G.resultLabel||"results")} in the last 4 weeks). It's working, so keep the rhythm.`};
+return{tone:"steady",msg:"Target hit. Results lag behind actions, so keep stacking weeks like this one."};
+}
+
+/* ============ RENDER ============ */
+const VIEWS={home:"Home",track:"Scoreboard",library:"Library",meeting:"Meeting",rules:"Rules"};
+const ICONS={home:"✦",track:"▲",library:"❦",meeting:"◎",rules:"✧"};
+function render(){
+const st=snapshotInputs();
+const app=$("#app");
+if(S.stage==="auth"){app.innerHTML=authView();return}
+if(S.stage==="code"){app.innerHTML=codeView();return}
+if(S.stage==="reset"){app.innerHTML=resetView();return}
+if(S.loading||S.stage==="load"){app.innerHTML=`<div class="lock"><div class="mark" style="margin:0 auto 14px">AG</div><p class="muted">Opening the members' room…</p></div>`;return}
+const m=me();
+if(!m||!m.committedAt){app.innerHTML=topBar(false)+`<main><div class="wrap">${onboardView()}</div></main>`;restoreInputs(st);return}
+const body=(VIEWS[S.view]?window["v_"+S.view]:v_home)(m);
+app.innerHTML=topBar(true)+`<main><div class="wrap">${body}</div></main>`+bottomNav();
+restoreInputs(st);
+}
+function topBar(full){
+const m=me();const G=goalsOf(m);const wk=wkAt(0);
+const chip=(g,cls,lbl)=>{const x=G[g]||{};return x.title?`<button class="gchip ${cls}" onclick="go('track')"><div><small>${lbl}</small><span class="t">${esc(x.title)}</span></div><span class="n">${actions(m,wk,g)}/${esc(x.leadTarget||"–")}</span></button>`:""};
+return `<div class="top"><div class="wrap"><div class="row between"><div class="brand"><div class="mark">AG</div><b>Achieving Greatness</b></div>${full?`<nav class="tabs">${Object.keys(VIEWS).map(v=>`<button class="${S.view===v?"on":""}" onclick="go('${v}')">${VIEWS[v]}</button>`).join("")}</nav>`:""}</div>${full?`<div class="ribbon">${chip("short","","30–90 day goal")}${chip("long","long","1 year+ goal")}</div>`:""}</div></div>`;
+}
+function bottomNav(){return `<nav class="bnav">${Object.keys(VIEWS).map(v=>`<button class="${S.view===v?"on":""}" onclick="go('${v}')"><i>${ICONS[v]}</i>${VIEWS[v]}</button>`).join("")}</nav>`}
+function authView(){const t=S.authTab||"in";
+return `<div class="lock wrap" style="max-width:440px;margin-top:40px"><div class="mark" style="margin:0 auto 16px;width:58px;height:58px;font-size:1.6rem">AG</div><p class="eyebrow">Achieving Greatness</p><h1 class="mt">Member Login</h1>
+${S.offline?`<p class="muted mt">The members' room is being set up. Check back soon.</p>`:`
+<div class="sub" style="justify-content:center;margin-top:18px"><button class="${t==="in"?"on":""}" onclick="S.authTab='in';render()">Sign in</button><button class="${t==="join"?"on":""}" onclick="S.authTab='join';render()">I'm new</button></div>
+<div class="card" style="text-align:left">${t==="in"?`<form onsubmit="event.preventDefault();doSignIn()">
+<label>Email</label><input id="ae" type="email" autocomplete="email" inputmode="email">
+<label>Password</label><input id="ap" type="password" autocomplete="current-password">
+<button class="btn gold mt" style="width:100%">Sign in</button></form>
+<p class="small mt"><a href="#" onclick="forgot();return false">Forgot your password?</a></p>`:`<form onsubmit="event.preventDefault();doJoin()">
+<label>First name</label><input id="jn" autocomplete="given-name">
+<label>Email</label><input id="je" type="email" autocomplete="email" inputmode="email">
+<label>Create a password <span class="hint">(8+ characters)</span></label><input id="jp" type="password" autocomplete="new-password">
+<label>Member code <span class="hint">(from Angel)</span></label><input id="jc" autocomplete="off">
+<button class="btn gold mt" style="width:100%">Create my account</button></form>`}</div>`}
+<p class="small mt2"><a href="${PUBLIC_PAGE}#how" target="_blank" rel="noopener">▶ Watch how it works</a></p></div>`}
+function resetView(){return `<div class="lock wrap" style="max-width:440px;margin-top:40px"><div class="mark" style="margin:0 auto 16px;width:58px;height:58px;font-size:1.6rem">AG</div><h1>New password</h1>
+<div class="card mt" style="text-align:left"><form onsubmit="event.preventDefault();doReset()"><label>New password <span class="hint">(8+ characters)</span></label><input id="np" type="password" autocomplete="new-password"><button class="btn gold mt" style="width:100%">Save password</button></form></div></div>`}
+async function forgot(){const email=(($("#ae")||{}).value||"").trim();if(!email){toast("Type your email above first.");return}
+const {error}=await SB.auth.resetPasswordForEmail(email,{redirectTo:location.origin+location.pathname});
+toast(error?"Couldn't send the reset email. Try again.":"Check your email for a reset link.")}
+async function doReset(){const pw=$("#np").value;if(pw.length<8){toast("At least 8 characters.");return}
+const {error}=await SB.auth.updateUser({password:pw});if(error){toast("Couldn't save it. Try again.");return}
+toast("Password saved.");const {data}=await SB.auth.getSession();if(data&&data.session){S.uid=data.session.user.id;await afterSignIn()}else{S.stage="auth";render()}}
+function codeView(){return `<div class="lock wrap" style="max-width:440px;margin-top:40px"><div class="mark" style="margin:0 auto 16px;width:58px;height:58px;font-size:1.6rem">AG</div><h1>One last thing</h1><p class="muted mt">Enter the member code to join the mastermind.</p>
+<div class="card mt" style="text-align:left"><form onsubmit="event.preventDefault();doCode()"><label>First name</label><input id="cn" value="${esc((S.draft||{}).name||"")}"><label>Member code</label><input id="cc" autocomplete="off"><button class="btn gold mt" style="width:100%">Join</button></form></div>
+<p class="small mt2"><a href="#" onclick="logOut();return false">Use a different account</a></p></div>`}
+
+/* ---------- PENDING ACCESS ---------- */
+function pendingView(){return `<div class="card" style="max-width:600px;margin:30px auto;text-align:center"><div class="mark" style="margin:0 auto 14px;width:54px;height:54px;font-size:1.5rem">AG</div><p class="eyebrow">You're signed in</p><h1 class="mt">One more step and you're in.</h1><p class="muted mt">To save your goals and check-ins, Angel needs to add your email to this page. Send her the email address you use for Claude, then refresh this page.</p><p class="small muted">Until then you can look around, but nothing will save.</p></div>`}
+
+/* ---------- ONBOARDING ---------- */
+function onboardView(){
+const d=S.draft;d.step=d.step||1;const st=d.step;
+const dots=`<div class="stepdots">${[1,2,3,4].map(i=>`<i class="${i<=st?"on":""}"></i>`).join("")}</div>`;
+let h=`<div class="card" style="max-width:640px;margin:0 auto">${dots}`;
+if(st===1){h+=`<p class="eyebrow">Welcome, sister</p><h1 class="mt">Write the vision. Make it plain.</h1>${verse("hab")}
+<label>Your first name</label><input data-k="name" placeholder="e.g. Angel" value="${esc(d.name||"")}">
+<p class="muted small mt">Next you'll set two goals. Whatever you write, you're agreeing to work on it. It will sit at the top of every screen so you never lose sight of it.</p>
+<div class="row mt"><button class="btn gold" onclick="ob(2)">Let's go</button></div>`}
+if(st===2||st===3){const g=st===2?"short":"long";const v=d[g]||{};
+h+=`<p class="eyebrow">${st===2?"Goal 1 of 2 · 30 to 90 days":"Goal 2 of 2 · 1 year or more"}</p>
+<h2 class="mt">${st===2?"What do you desire most in the next 30–90 days, the thing that would make all the difference?":"What's the big one? It may take a year or more, but it means a lot to you."}</h2>
+<label>My goal</label><textarea data-k="${g}.title" placeholder="${st===2?"e.g. Land a full-time remote role at $65K+":"e.g. Grow my coaching business to $10K months"}">${esc(v.title||"")}</textarea>
+<label>Why it matters to me <span class="hint">(optional)</span></label><input data-k="${g}.why" value="${esc(v.why||"")}">
+<label>How I'll know it's happening <span class="hint">(the result you count, e.g. interviews, clients, $ earned)</span></label><input data-k="${g}.resultLabel" placeholder="e.g. interviews" value="${esc(v.resultLabel||"")}">
+<div class="grid g2"><div><label>Weekly action that moves it <span class="hint">(what you'll do over and over)</span></label><input data-k="${g}.leadLabel" placeholder="e.g. applications sent" value="${esc(v.leadLabel||"")}"></div>
+<div><label>How many per week?</label><input data-k="${g}.leadTarget" type="number" min="1" inputmode="numeric" placeholder="e.g. 15" value="${esc(v.leadTarget||"")}"></div></div>
+<label>My if-then plan <span class="hint">(If [obstacle], then I will [action])</span></label><input data-k="${g}.ifThen" placeholder="If I feel stuck at 9am, then I'll send 3 applications before I check email" value="${esc(v.ifThen||"")}">
+<label>Target date <span class="hint">(optional)</span></label><input data-k="${g}.deadline" type="date" value="${esc(v.deadline||"")}">
+<div class="row mt"><button class="btn ghost" onclick="ob(${st-1})">Back</button><button class="btn gold" onclick="ob(${st+1})">Continue</button></div>`}
+if(st===4){h+=`<p class="eyebrow">The covenant</p><h2 class="mt">I'm in. I commit.</h2>${verse("eccl5")}<div class="mt">
+${RULES.map((r,i)=>`<label class="pledge"><input type="checkbox" data-k="pl${i}"> <span><b>${esc(r.t)}</b> <span class="muted">${esc(r.d)}</span></span></label>`).join("")}</div>
+<div class="row mt"><button class="btn ghost" onclick="ob(3)">Back</button><button class="btn gold" onclick="commitNow()">I commit to this</button></div>`}
+return h+`</div>`;
+}
+function collectDraft(){document.querySelectorAll("#app [data-k]").forEach(el=>{const k=el.dataset.k;if(k.startsWith("pl"))return;const p=k.split(".");if(p.length===2){S.draft[p[0]]=S.draft[p[0]]||{};S.draft[p[0]][p[1]]=el.value.trim()}else S.draft[k]=el.value.trim()})}
+function ob(n){collectDraft();const d=S.draft;
+if(n===2&&!d.name){toast("Add your first name.");return}
+if(n>d.step&&(d.step===2||d.step===3)){const g=d.step===2?"short":"long";const v=d[g]||{};if(!v.title||!v.leadLabel||!(+v.leadTarget>0)){toast("Add your goal, your weekly action and a number.");return}}
+d.step=n;$("#app").querySelectorAll("[data-k]").forEach(el=>el.setAttribute("data-fresh",""));render();window.scrollTo(0,0)}
+function commitNow(){const boxes=[...document.querySelectorAll("#app [data-k^='pl']")];if(boxes.some(b=>!b.checked)){toast("Check every line to commit.");return}
+const d=S.draft;const goal=v=>({title:v.title,why:v.why||"",resultLabel:v.resultLabel||"results",leadLabel:v.leadLabel,leadTarget:+v.leadTarget,ifThen:v.ifThen||"",deadline:v.deadline||""});
+saveMe({name:d.name,committedAt:Date.now(),goals:{short:goal(d.short),long:goal(d.long)},since:{short:0,long:0},disc:{book:"noexcuses"}});
+S.draft={};S.view="home";confetti(80);toast("Committed. Let's achieve greatness.")}
+
+/* ---------- HOME ---------- */
+function v_home(m){
+const wk=wkAt(0);const G=goalsOf(m);const nn=nonNeg(m,wk);const today=dayKey(new Date());const fr=((m.days||{})[today])||{};
+const partners=Object.entries(S.members).filter(([id,x])=>id!==S.uid&&x&&x.committedAt);
+const pctFn=g=>{const t=+((G[g]||{}).leadTarget||0);return t?Math.min(100,Math.round(actions(m,wk,g)/t*100)):0};
+const goalCard=(g,lbl)=>{const x=G[g]||{};const p=pctFn(g);return `<div class="goal ${g==="long"?"long":""}"><span class="pill" style="background:rgba(255,255,255,.18);color:#fff">${lbl}</span><h3>${esc(x.title)}</h3>
+<div class="meta">${actions(m,wk,g)} of ${esc(x.leadTarget)} ${esc(x.leadLabel)} this week</div><div class="bar"><i style="width:${p}%"></i></div>
+<div class="meta">${results(m,wk,g)} ${esc(x.resultLabel)} logged this week${x.deadline?` · target ${esc(fmtShort(new Date(x.deadline+"T12:00")))}`:""}</div>
+<div class="row mt"><button class="btn sm" onclick="logAction('${g}')">+1 ${esc(short(x.leadLabel))}</button><button class="btn sm clear" onclick="logResult('${g}')">+ Result</button></div></div>`};
+return `
+<div class="hero"><div class="row between"><div><p class="eyebrow">${esc(weekLabel(0))}</p><h1 class="mt" style="font-size:2rem">Hey ${esc(m.name)}, let's get to work.</h1></div>
+<div class="score"><div class="ring" style="--p:${nn.done*25}"><div>${nn.done}/4<small>THIS WEEK</small></div></div></div></div></div>
+
+<div class="grid g2 mt">${goalCard("short","30–90 days")}${goalCard("long","1 year +")}</div>
+
+<div class="grid g2 mt">
+<div class="card"><div class="row between"><h3>Today's frog</h3><span class="pill gold">🔥 ${streak(m)}-day streak</span></div>
+<p class="muted small">Your one most important task. Do it first.</p>
+${fr.frog?`<div class="frog mt"><span class="em">🐸</span><div style="flex:1"><b class="${fr.done?"done-strike":""}">${esc(fr.frog)}</b></div>${fr.done?`<span class="pill ok">Eaten</span>`:`<button class="btn gold sm" onclick="frogDone()">Ate it</button>`}</div>
+<button class="btn ghost sm mt" onclick="frogEdit()">Change</button>`:`<div class="row mt" style="flex-wrap:nowrap"><input data-k="frog" placeholder="e.g. Send 3 follow-up emails"><button class="btn sm" onclick="frogSet()">Set</button></div>`}
+<p class="small muted mt">${frogsThisWeek(m)} of 7 frogs eaten this week.</p></div>
+
+<div class="card"><h3>This week's non-negotiables</h3>
+${nn.items.map(i=>`<div class="check"><div class="box ${i.ok?"on":""}">${i.ok?"✓":""}</div><div><b>${esc(i.t)}</b><span class="small muted">${esc(i.d)}</span></div>${!i.ok&&(i.k==="disc"||i.k==="wealth")?`<button class="btn ghost sm act" onclick="logReading('${i.k}')">Log</button>`:""}${!i.ok&&i.k==="meet"?`<button class="btn ghost sm act" onclick="go('meeting')">Go</button>`:""}</div>`).join("")}
+</div>
+</div>
+
+<div class="grid g2 mt">
+<div class="card"><h3>Flip it</h3><p class="muted small">Caught yourself saying "this isn't working"? Turn it into truth and a next step.</p><button class="btn mt" onclick="flipIt()">Flip a doubt</button>
+<p class="small muted mt">${(m.flips||[]).length} doubts flipped so far.</p></div>
+<div class="card"><h3>Weekly progress report</h3><p class="muted small">Send it to your sister every Friday. Weekly progress reports to a friend were the strongest habit in Dr. Gail Matthews' goals study.</p><button class="btn mt" onclick="report()">Create my report</button></div>
+</div>
+
+${partners.length?`<h2 class="mt2">Your sister${partners.length>1?"s":""} in this</h2><div class="grid g2 mt">${partners.map(([id,p])=>partnerCard(p)).join("")}</div>`:`<div class="card mt2"><h3>Waiting on your sister</h3><p class="muted small">Once your mastermind partner signs in and commits, her goals and weekly progress show up here.</p></div>`}
+${verse("james")}`;
+}
+function short(s){s=String(s||"action");return s.length>22?s.slice(0,20)+"…":s}
+function partnerCard(p){const wk=wkAt(0);const G=goalsOf(p);const nn=nonNeg(p,wk);
+return `<div class="card"><div class="row"><div class="av">${esc(initials(p.name))}</div><b>${esc(p.name)}</b><span class="pill" style="margin-left:auto">${nn.done}/4 this week</span></div>
+${["short","long"].map(g=>{const x=G[g]||{};return `<div class="mt"><span class="eyebrow">${g==="short"?"30–90 days":"1 year +"}</span><div><b>${esc(x.title)}</b></div><div class="small muted">${actions(p,wk,g)}/${esc(x.leadTarget)} ${esc(x.leadLabel)} · ${results(p,wk,g)} ${esc(x.resultLabel)}</div></div>`}).join("")}
+<div class="small muted mt">🔥 ${streak(p)}-day frog streak</div></div>`}
+
+/* actions */
+function logAction(g){openSheet(`<h3>+1 ${esc(goalsOf(me())[g].leadLabel)}</h3><p class="muted small">Add a quick note if you want (who, what, where).</p><input data-k="an" placeholder="Optional note"><div class="row mt"><button class="btn gold" onclick="doAction('${g}')">Log it</button><button class="btn ghost" onclick="closeSheet()">Cancel</button></div>`);setTimeout(()=>{const i=$("#layer input");i&&i.focus()},50)}
+function doAction(g){const m=me();const wk=wkAt(0);const note=($("#layer input")||{}).value||"";const n=actions(m,wk,g)+1;const since=+((m.since||{})[g]||0)+1;
+const log=[{t:Date.now(),g,n:note.slice(0,140)},...(m.log||[])].slice(0,150);
+closeSheet();saveMe({weeks:{[wk]:{actions:{[g]:n}}},since:{[g]:since},log});
+const t=+goalsOf(m)[g].leadTarget||0;if(t&&n===t){confetti(90);toast("Weekly target hit!")}else{confetti(18)}}
+function undoAction(g){const m=me();const wk=wkAt(0);const n=Math.max(0,actions(m,wk,g)-1);const since=Math.max(0,+((m.since||{})[g]||0)-1);saveMe({weeks:{[wk]:{actions:{[g]:n}}},since:{[g]:since}});toast("Removed one.")}
+function logResult(g){const x=goalsOf(me())[g];openSheet(`<h3>Log a result</h3><p class="muted small">How many ${esc(x.resultLabel)} came in? This is the scoreboard's proof that the actions are working.</p><input data-k="rn" type="number" min="1" value="1" inputmode="numeric"><div class="row mt"><button class="btn gold" onclick="doResult('${g}')">Log it</button><button class="btn ghost" onclick="closeSheet()">Cancel</button></div>`)}
+function doResult(g){const m=me();const wk=wkAt(0);const add=Math.max(1,+($("#layer input").value)||1);closeSheet();saveMe({weeks:{[wk]:{results:{[g]:results(m,wk,g)+add}}}});confetti(70);toast("Praise God! Logged.")}
+
+/* frog */
+function frogSet(){const v=($("#app [data-k='frog']")||{}).value||"";if(!v.trim()){toast("Name your frog first.");return}saveMe({days:{[dayKey(new Date())]:{frog:v.trim().slice(0,160),done:false}}})}
+function frogDone(){saveMe({days:{[dayKey(new Date())]:{done:true}}});confetti(60);toast("Frog eaten. The rest of the day is downhill.")}
+function frogEdit(){const fr=(me().days||{})[dayKey(new Date())]||{};openSheet(`<h3>Today's frog</h3><input id="fe" value="${esc(fr.frog||"")}"><div class="row mt"><button class="btn gold" onclick="saveMe({days:{['${dayKey(new Date())}']:{frog:$('#fe').value.trim().slice(0,160)}}});closeSheet()">Save</button><button class="btn ghost" onclick="closeSheet()">Cancel</button></div>`)}
+
+/* reading log */
+function logReading(kind){const m=me();const wk=wkAt(0);const w=wkData(m,wk)[kind]||{};
+const opts=kind==="disc"?DISC_BOOKS.map(b=>`<option value="${b.id}" ${((w.book||(m.disc||{}).book)===b.id)?"selected":""}>${esc(b.title)}</option>`).join(""):
+[...ALL_WEALTH.map(b=>`<option value="${b.id}" ${w.book===b.id?"selected":""}>${esc(b.title)}</option>`),...S.library.map(b=>`<option value="${esc(b.id)}" ${w.book===b.id?"selected":""}>${esc(b.title)} (added)</option>`)].join("");
+openSheet(`<h3>${kind==="disc"?"Discipline chapter":"Wealth consciousness chapter"}</h3><p class="muted small">Read it or listen to it. Both count.</p>
+<label>Book</label><select id="rb">${opts}</select>
+<label>Chapter</label><input id="rc" placeholder="${kind==="disc"?"e.g. 4":"e.g. Ch. 3 or Proverbs 17"}" value="${esc(w.ch||"")}">
+<label>My one-line takeaway</label><textarea id="rt" placeholder="What will you do differently?">${esc(w.take||"")}</textarea>
+<div class="row mt"><button class="btn gold" onclick="doReading('${kind}')">Check it off</button><button class="btn ghost" onclick="closeSheet()">Cancel</button></div>`)}
+function doReading(kind){const book=$("#rb").value,ch=$("#rc").value.trim(),take=$("#rt").value.trim();if(!ch){toast("Which chapter?");return}
+const patch={weeks:{[wkAt(0)]:{[kind]:{book,ch:ch.slice(0,60),take:take.slice(0,400)}}}};if(kind==="disc")patch.disc={book,lastCh:ch};
+closeSheet();saveMe(patch);confetti(50);toast("Checked off. That's how disciplined women are made.")}
+
+/* flip it */
+function flipIt(){openSheet(`<p class="eyebrow">Flip it</p><h3 class="mt">Say the doubt once. Then flip it.</h3>${verse("phil")}
+<label>The doubt or complaint</label><textarea id="fd" placeholder="e.g. Nobody is responding to my applications."></textarea>
+<label>The truth <span class="hint">(what God says, or what's actually true)</span></label><textarea id="ft" placeholder="e.g. God gives me power to get wealth. I've sent 9 of 15 this week."></textarea>
+<label>My next action</label><input id="fn" placeholder="e.g. Send 3 tailored applications by noon">
+<div class="row mt"><button class="btn gold" onclick="doFlip()">Flip it</button><button class="btn ghost" onclick="closeSheet()">Cancel</button></div>`)}
+function doFlip(){const d=$("#fd").value.trim(),t=$("#ft").value.trim(),n=$("#fn").value.trim();if(!d||!t||!n){toast("A flip needs all three: the doubt, the truth, and the next action.");return}
+const flips=[{at:Date.now(),d:d.slice(0,300),t:t.slice(0,400),n:n.slice(0,200)},...(me().flips||[])].slice(0,100);closeSheet();saveMe({flips});confetti(40);toast("Flipped. Now go do the next action.")}
+
+/* report */
+function reportText(m){const wk=wkAt(0);const G=goalsOf(m);const w=wkData(m,wk);const commits=((w.mtg||{}).commits||[]).filter(c=>c.t);
+const L=[`ACHIEVING GREATNESS · ${weekLabel(0)}`,`${m.name}'s weekly report`,``];
+["short","long"].forEach(g=>{const x=G[g]||{};L.push(`${g==="short"?"30–90 day":"1 year+"} goal: ${x.title}`);L.push(`  ${actions(m,wk,g)}/${x.leadTarget} ${x.leadLabel} · ${results(m,wk,g)} ${x.resultLabel}`)});
+L.push(``);L.push(`Discipline reading: ${w.disc&&w.disc.ch?bookTitle(w.disc.book)+" ch. "+w.disc.ch+(w.disc.take?" — "+w.disc.take:""):"not yet"}`);
+L.push(`Wealth reading: ${w.wealth&&w.wealth.ch?bookTitle(w.wealth.book)+" "+w.wealth.ch+(w.wealth.take?" — "+w.wealth.take:""):"not yet"}`);
+L.push(`Frogs eaten: ${frogsThisWeek(m)}/7 · Streak: ${streak(m)} day${streak(m)===1?"":"s"}`);L.push(`Non-negotiables: ${nonNeg(m,wk).done}/4`);
+if(commits.length){L.push(``);L.push(`My commitments:`);commits.forEach(c=>L.push(`  • ${c.t}`))}
+return L.join("\n")}
+function report(){const t=reportText(me());openSheet(`<h3>Your weekly report</h3><p class="muted small">Copy it and text it to your sister.</p><textarea id="rp" style="min-height:260px;font-size:.88rem">${esc(t)}</textarea><div class="row mt"><button class="btn gold" onclick="copyReport()">Copy</button><button class="btn ghost" onclick="closeSheet()">Close</button></div>`)}
+function copyReport(){const el=$("#rp");const v=el.value;(navigator.clipboard&&navigator.clipboard.writeText?navigator.clipboard.writeText(v):Promise.reject()).then(()=>toast("Copied. Paste it into your text.")).catch(()=>{el.focus();el.select();toast("Selected. Press copy on your keyboard.")})}
+
+/* ---------- SCOREBOARD ---------- */
+function v_track(m){const G=goalsOf(m);
+return `<p class="eyebrow">The scoreboard</p><h1 class="mt">Make it measurable.</h1>
+<p class="muted">Actions are what you control. Results are what you count. If actions are on target and results aren't moving, change the strategy. If actions are behind, change nothing but your effort.</p>
+${["short","long"].map(g=>goalBoard(m,g,G[g]||{})).join("")}
+<div class="card mt2"><div class="row between"><h3>Recent actions</h3></div><ul class="loglist mt">${(m.log||[]).slice(0,12).map(l=>`<li><span class="pill ${l.g==="long"?"gold":""}">${l.g==="short"?"30–90":"1 yr+"}</span> <span class="muted small">${esc(new Date(l.t).toLocaleString(undefined,{weekday:"short",hour:"numeric",minute:"2-digit"}))}</span> ${esc(l.n||"")}</li>`).join("")||`<li class="muted">Nothing logged yet. Tap +1 when you take an action.</li>`}</ul></div>
+<div class="card mt2"><h3>Evaluations</h3>${(m.evals||[]).length?`<ul class="loglist mt">${m.evals.slice(0,10).map(e=>`<li><b>${esc(new Date(e.at).toLocaleDateString())} · ${e.g==="short"?"30–90 day":"1 year+"}</b><br><span class="muted small">Numbers:</span> ${esc(e.data)}<br><span class="muted small">Changing:</span> ${esc(e.change)}<br><span class="muted small">Truth:</span> ${esc(e.truth)}<br><span class="muted small">Next:</span> ${esc(e.next)}</li>`).join("")}</ul>`:`<p class="muted small">None yet. Evaluations unlock after 5 logged actions.</p>`}</div>
+<div class="card mt2"><h3>Flipped doubts</h3>${(m.flips||[]).length?`<ul class="loglist mt">${m.flips.slice(0,10).map(f=>`<li><s class="muted">${esc(f.d)}</s><br><b>${esc(f.t)}</b><br><span class="small">Next: ${esc(f.n)}</span></li>`).join("")}</ul>`:`<p class="muted small">None yet. Good.</p>`}<button class="btn ghost sm mt" onclick="flipIt()">Flip a doubt</button></div>`}
+function goalBoard(m,g,x){const t=+x.leadTarget||0;const offs=[-7,-6,-5,-4,-3,-2,-1,0];const vals=offs.map(o=>({a:actions(m,wkAt(o),g),r:results(m,wkAt(o),g),o}));
+const max=Math.max(t,...vals.map(v=>v.a),1);const dg=diagnose(m,g);const since=+((m.since||{})[g]||0);const unlocked=since>=5;
+return `<div class="card mt2"><div class="row between"><span class="pill ${g==="long"?"gold":""}">${g==="short"?"30–90 day goal":"1 year+ goal"}</span><button class="btn ghost sm" onclick="editGoal('${g}')">Edit goal</button></div>
+<h2 class="mt">${esc(x.title)}</h2>${x.why?`<p class="muted small">${esc(x.why)}</p>`:""}
+<div class="stats mt"><div><div class="eyebrow">This week</div><div class="streak">${actions(m,wkAt(0),g)}<span style="font-size:1.1rem;color:var(--muted)"> / ${t}</span></div><div class="small muted">${esc(x.leadLabel)}</div></div>
+<div><div class="eyebrow">Results</div><div class="streak">${results(m,wkAt(0),g)}</div><div class="small muted">${esc(x.resultLabel)}</div></div>
+<div><div class="eyebrow">8-week results</div><div class="streak">${vals.reduce((s,v)=>s+v.r,0)}</div><div class="small muted">${esc(x.resultLabel)}</div></div></div>
+<div class="bars mt">${vals.map(v=>`<div class="col"><div class="b ${t&&v.a>=t?"hit":""}" style="height:${Math.max(4,v.a/max*100)}%"><em>${v.a||""}</em></div><div class="lbl">${v.o===0?"now":(d=>(d.getMonth()+1)+"/"+d.getDate())(addDays(monday(new Date()),v.o*7))}</div>${v.r?`<div class="lbl" style="color:var(--ok);font-weight:700">+${v.r}</div>`:""}</div>`).join("")}</div>
+<p class="small muted">Gold bars = weekly target hit. Green numbers = results.</p>
+<div class="diag ${dg.tone}">${dg.msg}</div>
+${x.ifThen?`<p class="small mt"><b>My if-then plan:</b> ${esc(x.ifThen)}</p>`:""}
+<div class="row mt"><button class="btn gold sm" onclick="logAction('${g}')">+1 ${esc(short(x.leadLabel))}</button><button class="btn ghost sm" onclick="logResult('${g}')">+ Result</button><button class="btn ghost sm" onclick="undoAction('${g}')">−1</button></div>
+<div class="lockline">${unlocked?`<span>🔓</span><div style="flex:1">You've earned the right to evaluate this strategy.</div><button class="btn sm" onclick="evaluate('${g}')">Evaluate</button>`:`<span>🔒</span><div style="flex:1">"This isn't working" unlocks after 5 actions. <b>${5-since} to go.</b></div>`}</div></div>`}
+function evaluate(g){openSheet(`<p class="eyebrow">Earned evaluation</p><h3 class="mt">Bring data, a change, and a truth.</h3>${verse("prov14")}
+<label>What do the numbers say?</label><textarea id="e1" placeholder="e.g. 15 applications a week for 3 weeks, 0 interviews."></textarea>
+<label>The one thing I'll change</label><textarea id="e2" placeholder="e.g. Rewrite my resume headline and only apply to roles under 2 days old."></textarea>
+<label>What God says</label><textarea id="e3"></textarea>
+<label>My next action</label><input id="e4">
+<div class="row mt"><button class="btn gold" onclick="doEval('${g}')">Save evaluation</button><button class="btn ghost" onclick="closeSheet()">Cancel</button></div>`)}
+function doEval(g){const v=["e1","e2","e3","e4"].map(i=>$("#"+i).value.trim());if(v.some(x=>!x)){toast("Fill in all four.");return}
+const evals=[{at:Date.now(),g,data:v[0].slice(0,400),change:v[1].slice(0,400),truth:v[2].slice(0,400),next:v[3].slice(0,200)},...(me().evals||[])].slice(0,60);
+closeSheet();saveMe({evals,since:{[g]:0}});toast("Saved. Bring it to this week's meeting.")}
+function editGoal(g){const x=goalsOf(me())[g]||{};openSheet(`<h3>Edit ${g==="short"?"30–90 day":"1 year+"} goal</h3>
+<label>My goal</label><textarea id="g1">${esc(x.title)}</textarea><label>Why it matters</label><input id="g2" value="${esc(x.why)}">
+<label>Result I count</label><input id="g3" value="${esc(x.resultLabel)}"><div class="grid g2"><div><label>Weekly action</label><input id="g4" value="${esc(x.leadLabel)}"></div><div><label>Per week</label><input id="g5" type="number" min="1" value="${esc(x.leadTarget)}"></div></div>
+<label>If-then plan</label><input id="g6" value="${esc(x.ifThen)}"><label>Target date</label><input id="g7" type="date" value="${esc(x.deadline)}">
+<div class="row mt"><button class="btn gold" onclick="doEditGoal('${g}')">Save</button><button class="btn ghost" onclick="closeSheet()">Cancel</button></div>`)}
+function doEditGoal(g){const v=k=>$("#"+k).value.trim();if(!v("g1")||!v("g4")||!(+v("g5")>0)){toast("Goal, weekly action and number are required.");return}
+closeSheet();saveMe({goals:{[g]:{title:v("g1"),why:v("g2"),resultLabel:v("g3")||"results",leadLabel:v("g4"),leadTarget:+v("g5"),ifThen:v("g6"),deadline:v("g7")}}});toast("Goal updated.")}
+
+/* ---------- LIBRARY ---------- */
+function linkBtns(ls){return `<div class="links">${ls.map(l=>`<a class="${l.c||""}" href="${esc(l.u)}" target="_blank" rel="noopener">${esc(l.t)} ↗</a>`).join("")}</div>`}
+function v_library(m){const t=S.libTab;const wk=wkAt(0);const w=wkData(m,wk);
+const tabs=`<div class="sub">${[["disc","Discipline"],["wealth","Wealth consciousness"],["added","Our additions"]].map(([k,l])=>`<button class="${t===k?"on":""}" onclick="S.libTab='${k}';render()">${l}</button>`).join("")}</div>`;
+let h=`<p class="eyebrow">The library</p><h1 class="mt">No excuses. Every book, one tap away.</h1><p class="muted">Free audio wherever it exists, so you can listen in the car, at the gym, or while you cook.</p>${tabs}`;
+if(t==="disc"){h+=`<div class="card mb"><div class="row between"><div><b>This week:</b> ${w.disc&&w.disc.ch?`✓ ${esc(bookTitle(w.disc.book))} ch. ${esc(w.disc.ch)}`:`<span class="muted">one chapter of either book</span>`}</div><button class="btn sm" onclick="logReading('disc')">${w.disc&&w.disc.ch?"Update":"Log my chapter"}</button></div></div>
+<div class="grid g2">${DISC_BOOKS.map(b=>`<div class="card book"><span class="pill gold">1 chapter / week</span><h3>${esc(b.title)}</h3><div class="by">${esc(b.by)}</div>${linkBtns(b.links)}</div>`).join("")}</div>
+<div class="note mt"><b>Have the PDF?</b> Add your own link (e.g. a Google Drive file) under <a href="#library" onclick="S.libTab='added';render();return false">Our additions</a> so it lives here too.</div>`}
+if(t==="wealth"){const pd=Math.min(new Date().getDate(),31);
+h+=`<div class="card mb"><div class="row between"><div><b>This week:</b> ${w.wealth&&w.wealth.ch?`✓ ${esc(bookTitle(w.wealth.book))} · ${esc(w.wealth.ch)}`:`<span class="muted">one chapter from any book below</span>`}</div><button class="btn sm" onclick="logReading('wealth')">${w.wealth&&w.wealth.ch?"Update":"Log my chapter"}</button></div></div>`;
+WEALTH.forEach(s=>{h+=`<h2 class="mt2">${esc(s.sec)}</h2><p class="muted small">${esc(s.blurb)}</p>${s.note?verse(s.note):""}<div class="grid g2 mt">${s.items.map(b=>{const links=b.dyn==="proverbs"?[{t:`Today: Proverbs ${pd}`,u:BG("Proverbs "+pd),c:"free"}]:b.links;return `<div class="card book"><h3>${esc(b.title)}</h3><div class="by">${esc(b.by)}</div>${linkBtns(links)}</div>`}).join("")}</div>`});}
+if(t==="added"){h+=`<div class="card"><h3>Add a resource</h3><p class="muted small">A PDF in your Google Drive, a sermon, a YouTube audiobook you love. Both of you will see it.</p>
+<label>Title</label><input data-k="lt" placeholder="e.g. No Excuses! PDF"><label>Link</label><input data-k="lu" placeholder="https://"><label>Note <span class="hint">(optional)</span></label><input data-k="ln">
+<label>Shelf</label><select data-k="ls"><option value="wealth">Wealth consciousness</option><option value="disc">Discipline</option></select>
+<div class="row mt"><button class="btn gold" onclick="addLib()">Add to library</button></div></div>
+<div class="grid g2 mt">${S.library.map(r=>`<div class="card book"><span class="pill ${r.shelf==="disc"?"gold":""}">${r.shelf==="disc"?"Discipline":"Wealth"}</span><h3>${esc(r.title)}</h3>${r.note?`<div class="by">${esc(r.note)}</div>`:""}<div class="small muted">Added by ${esc((S.members[r.by]||{}).name||"a member")}</div>${linkBtns([{t:"Open",u:r.url,c:""}])}${r.by===S.uid?`<button class="btn ghost sm" style="align-self:flex-start" onclick="delLib('${esc(r.id)}')">Remove</button>`:""}</div>`).join("")||`<p class="muted">Nothing added yet.</p>`}</div>`}
+return h}
+function addLib(){const g=k=>(($("#app [data-k='"+k+"']")||{}).value||"").trim();const title=g("lt"),url=g("lu");
+if(!title||!/^https:\/\/\S+$/i.test(url)){toast("Add a title and a link that starts with https://");return}
+queue(async()=>{const r=await SB.from("ag_library").insert({title:title.slice(0,120),url:url.slice(0,600),note:g("ln").slice(0,200),shelf:g("ls")||"wealth"});if(r.error)throw r.error;
+toast("Added.");document.querySelectorAll("#app [data-k^='l']").forEach(e=>{if(e.tagName!=="SELECT")e.value=""})}).then(()=>loadAll()).then(render)}
+function delLib(id){S.library=S.library.filter(x=>x.id!==id);render();queue(async()=>{const r=await SB.from("ag_library").delete().eq("id",+id);if(r.error)throw r.error})}
+
+/* ---------- MEETING ---------- */
+function v_meeting(m){const off=S.meetOff;const wk=wkAt(off);const prevWk=wkAt(off-1);const mt=S.meetings[wk]||{};const checks=mt.checks||{};
+const mine=(wkData(m,wk).mtg)||{};const prevCommits=((wkData(m,prevWk).mtg)||{}).commits||[];
+const partners=Object.entries(S.members).filter(([id,x])=>id!==S.uid&&x&&x.committedAt);
+const present=!!wkData(m,wk).meeting;
+const commits=(mine.commits&&mine.commits.length?mine.commits:[{t:""},{t:""},{t:""}]);
+const field=(k,label,ph)=>`<label>${label}</label><textarea data-k="mt.${wk}.${k}" placeholder="${ph}">${esc(mine[k]||"")}</textarea>`;
+return `<p class="eyebrow">The weekly meeting</p><div class="row between"><h1 class="mt">${esc(weekLabel(off))}</h1>
+<div class="row"><button class="btn ghost sm" onclick="S.meetOff--;render()">← Prev</button>${off<0?`<button class="btn ghost sm" onclick="S.meetOff++;render()">Next →</button>`:""}</div></div>
+<div class="row mt"><button class="btn ${present?"ghost":"gold"}" onclick="togglePresent('${wk}')">${present?"✓ I was present":"Mark me present"}</button><span class="muted small">Counts toward this week's non-negotiables.</span></div>
+
+<div class="card mt2 agenda"><h3>Agenda</h3><p class="muted small">Check each item off as you cover it. You both see the same checklist.</p>
+${AGENDA.map((a,i)=>`<div class="check" onclick="toggleAgenda('${wk}','${a.k}')" style="cursor:pointer"><div class="box ${checks[a.k]?"on":""}">${checks[a.k]?"✓":i+1}</div><div><b>${esc(a.t)}</b><span class="small muted">${esc(a.d)}</span></div></div>`).join("")}
+</div>
+
+<div class="card mt2"><h3>Last week's commitments</h3><p class="muted small">Done or not done. No stories.</p>
+${prevCommits.filter(c=>c.t).length?prevCommits.map((c,i)=>c.t?`<div class="check"><div style="flex:1"><b>${esc(c.t)}</b></div><div class="row"><button class="btn sm ${c.done===true?"":"ghost"}" onclick="markCommit('${prevWk}',${i},true)">Done</button><button class="btn sm ${c.done===false?"":"ghost"}" onclick="markCommit('${prevWk}',${i},false)">Not done</button></div></div>`:"").join(""):`<p class="muted small">No commitments were logged for the week before. Set yours below.</p>`}
+</div>
+
+<div class="grid g2 mt2">
+<div class="card"><div class="who"><div class="av">${esc(initials(m.name))}</div><h3>${esc(m.name)} (you)</h3></div>
+${field("wins","Wins","What went right? Celebrate it.")}
+${field("takeaways","Book takeaways","One line from each book.")}
+${field("challenges","Challenges","Where are you stuck?")}
+${field("help","Help I need","Ask for exactly what you need.")}
+${field("adjust","Adjustments","Based on the numbers, what changes?")}
+<label>Commitments for next week <span class="hint">(specific + measurable)</span></label>
+${commits.map((c,i)=>`<input class="mb" data-k="mt.${wk}.c${i}" placeholder="e.g. Send 15 applications by Friday" value="${esc(c.t||"")}">`).join("")}
+<button class="btn ghost sm" onclick="addCommit('${wk}')">+ Another</button>
+<label>If-then plan for the week</label><input data-k="mt.${wk}.ifthen" placeholder="If ___ happens, then I will ___" value="${esc(mine.ifthen||"")}">
+<div class="row mt"><button class="btn gold" onclick="saveMtg('${wk}',${commits.length})">Save my notes</button></div></div>
+${partners.map(([id,p])=>{const pm=(wkData(p,wk).mtg)||{};const ro=(l,v)=>`<label>${l}</label><div class="ro">${esc(v||"—")}</div>`;return `<div class="card"><div class="who"><div class="av">${esc(initials(p.name))}</div><h3>${esc(p.name)}</h3>${wkData(p,wk).meeting?`<span class="pill ok" style="margin-left:auto">Present</span>`:""}</div>
+${ro("Wins",pm.wins)}${ro("Book takeaways",pm.takeaways)}${ro("Challenges",pm.challenges)}${ro("Help she needs",pm.help)}${ro("Adjustments",pm.adjust)}
+<label>Her commitments</label>${(pm.commits||[]).filter(c=>c.t).map(c=>`<div class="ro mb">${esc(c.t)}</div>`).join("")||`<div class="ro">—</div>`}${pm.ifthen?ro("If-then",pm.ifthen):""}</div>`}).join("")||`<div class="card"><h3>Your sister's notes</h3><p class="muted small">They'll appear here once she joins.</p></div>`}
+</div>`}
+function togglePresent(wk){const v=!wkData(me(),wk).meeting;saveMe({weeks:{[wk]:{meeting:v}}});if(v){confetti(40)}}
+function toggleAgenda(wk,k){const cur=((S.meetings[wk]||{}).checks||{});saveMeeting(wk,{checks:{[k]:!cur[k]}})}
+function markCommit(wk,i,done){const mt=clone(wkData(me(),wk).mtg);const commits=(mt.commits||[]).map((c,j)=>j===i?{...c,done}:c);saveMe({weeks:{[wk]:{mtg:{commits}}}});if(done)confetti(30)}
+function addCommit(wk){const mt=clone(wkData(me(),wk).mtg);const n=readCommits(wk);if(n.length>=7){toast("Seven is plenty. Focus.");return}n.push({t:""});S.members[S.uid]=merge(me(),{weeks:{[wk]:{mtg:{commits:n}}}});render()}
+function readCommits(wk){const out=[];document.querySelectorAll(`#app [data-k^="mt.${wk}.c"]`).forEach(el=>{out.push({t:el.value.trim().slice(0,200)})});return out}
+function saveMtg(wk){const g=k=>((document.querySelector(`#app [data-k="mt.${wk}.${k}"]`)||{}).value||"").trim();
+const prev=((wkData(me(),wk).mtg||{}).commits)||[];const commits=readCommits(wk).map((c,i)=>({t:c.t,done:prev[i]&&prev[i].t===c.t?prev[i].done:null}));
+saveMe({weeks:{[wk]:{mtg:{wins:g("wins").slice(0,1500),takeaways:g("takeaways").slice(0,1500),challenges:g("challenges").slice(0,1500),help:g("help").slice(0,1500),adjust:g("adjust").slice(0,1500),ifthen:g("ifthen").slice(0,300),commits}}}});toast("Notes saved.")}
+
+/* ---------- RULES ---------- */
+function v_rules(m){return `<p class="eyebrow">Our covenant</p><h1 class="mt">The rules we agreed to.</h1>
+<div class="card mt">${RULES.map((r,i)=>`<div class="rule"><div class="num">${i+1}</div><div><h3>${esc(r.t)}</h3><p class="muted" style="margin:.35rem 0 0">${esc(r.d)}</p>${r.v?verse(r.v):""}</div></div>`).join("")}</div>
+<h2 class="mt2">Why this works</h2>
+<div class="grid g3 mt">
+<div class="card"><b>Write it + report it weekly</b><p class="small muted">In Dr. Gail Matthews' goals study at Dominican University, people who wrote their goals, made action commitments and sent weekly progress reports to a friend did the best of every group.</p></div>
+<div class="card"><b>If-then plans</b><p class="small muted">A meta-analysis of 94 studies (Gollwitzer &amp; Sheeran, 2006) found that spelling out when, where and how you'll act had a medium-to-large effect on reaching goals. That's why every goal and every week has an if-then plan.</p></div>
+<div class="card"><b>Lead and lag measures</b><p class="small muted">From The 4 Disciplines of Execution: you can't control results directly, only the actions that drive them. So we track both, every week, on one scoreboard.</p></div>
+</div>
+${verse("eccl4")}${verse("deut")}
+<div class="card mt2"><h3>My goals</h3><p class="muted small">Committed ${esc(new Date(m.committedAt).toLocaleDateString(undefined,{month:"long",day:"numeric",year:"numeric"}))}.</p><div class="row mt"><button class="btn ghost sm" onclick="go('track')">View or edit on the scoreboard</button><button class="btn ghost sm" onclick="logOut()">Log out</button></div></div>
+<p class="small mt2"><a href="${PUBLIC_PAGE}#how" target="_blank" rel="noopener">▶ Watch how it works</a></p>`}
+</script>
+</body>
+</html>
